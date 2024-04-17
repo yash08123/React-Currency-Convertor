@@ -6,8 +6,8 @@ import { useState } from "react";
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [city, setCity] = useState("Pune"); 
-  const api = "097d7f9b1b69335b45117e050d9a2431";
-  // const api = "585bb453c2617ee6bdd1d1111168e0df"; // If the above dosent work use this api key 
+  //const api = "097d7f9b1b69335b45117e050d9a2431";
+   const api = "585bb453c2617ee6bdd1d1111168e0df"; // If the above dosent work use this api key 
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -19,6 +19,19 @@ const Weather = () => {
     }
   };
 
+  const getClothingSuggestion = (temp) => {
+    if (temp < 0) {
+      return "It's freezing outside, wear a heavy coat and warm clothes.";
+    } else if (temp < 10) {
+      return "It's cold outside, wear a coat.";
+    } else if (temp < 20) {
+      return "It's a bit chilly, a sweater should be enough.";
+    } else if (temp < 30) {
+      return "It's warm outside, a t-shirt should be enough.";
+    } else {
+      return "It's hot outside, wear light clothes.";
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchData();
@@ -31,12 +44,11 @@ const Weather = () => {
   return (
     <>
       <div
-        className="w-full h-screen flex flex-wrap justify-center items-center bg-cover bg-no-repeat"
+        className=" flex flex-wrap justify-center items-center bg-cover bg-no-repeat"
         style={{
           backgroundImage: `url('https://m-cdn.phonearena.com/images/article/143515-wide-two_1200/Apple-tests-adding-news-to-the-native-Weather-app-in-iOS-16.2-Beta.webp?1667618530')`,
         }}
       >
-        <Navbar />
         <div className="w-full">
           <div className="w-full max-w-md mx-auto border border-gray-60 rounded-lg p-5 backdrop-blur-sm bg-white/30">
             <div className="flex flex-col">
@@ -81,9 +93,15 @@ const Weather = () => {
                   <p className="text-lg mt-2">
                     Wind Speed: {weatherData.wind.speed} m/s
                   </p>
+                  
                 </div>
               )}
             </div>
+
+            <div className="mt-4">
+            <p className="text-lg mt-2">{getClothingSuggestion(weatherData.main.temp)}</p>
+            </div>
+            
           </div>
         </div>
       </div>
