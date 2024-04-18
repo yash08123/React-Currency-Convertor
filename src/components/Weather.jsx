@@ -1,13 +1,91 @@
-import React from "react";
-import Navbar from "./Navbar";
+import React, { useState } from "react";
 import axios from "axios";
-import { useState } from "react";
 
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(null);
-  const [city, setCity] = useState("Pune"); 
-  //const api = "097d7f9b1b69335b45117e050d9a2431";
-   const api = "585bb453c2617ee6bdd1d1111168e0df"; // If the above dosent work use this api key 
+  const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
+  const api = "585bb453c2617ee6bdd1d1111168e0df"; // OpenWeatherMap API key
+
+  const countries = [
+    {
+      name: "USA",
+      states: ["New York", "California", "Texas"],
+      cities: {
+        "New York": ["New York City", "Buffalo", "Rochester"],
+        "California": ["Los Angeles", "San Francisco", "San Diego"],
+        "Texas": ["Houston", "Dallas", "Austin"]
+      }
+    },
+    {
+      name: "Canada",
+      states: ["Ontario", "Quebec", "Alberta"],
+      cities: {
+        "Ontario": ["Toronto", "Ottawa", "Hamilton"],
+        "Quebec": ["Montreal", "Quebec City", "Gatineau"],
+        "Alberta": ["Calgary", "Edmonton", "Red Deer"]
+      }
+    },
+    {
+      name: "UK",
+      states: ["England", "Scotland", "Wales"],
+      cities: {
+        "England": ["London", "Manchester", "Birmingham"],
+        "Scotland": ["Edinburgh", "Glasgow", "Aberdeen"],
+        "Wales": ["Cardiff", "Swansea", "Newport"]
+      }
+    },
+    {
+      name: "Australia",
+      states: ["New South Wales", "Queensland", "Victoria"],
+      cities:{
+        "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
+        "Queensland": ["Brisbane", "Gold Coast", "Sunshine Coast"],
+        "Victoria": ["Melbourne", "Geelong", "Ballarat"]
+      
+      }
+    },
+    {
+      name: "India",
+      states: ["Maharashtra", "Karnataka", "Tamil Nadu"],
+      cities: {
+        "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+        "Karnataka": ["Bangalore", "Mysore", "Hubli"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"]
+      }
+
+    },
+    {
+      name: "Germany",
+      states: ["Bavaria", "Hesse", "North Rhine-Westphalia"],
+      cities: {
+        "Bavaria": ["Munich", "Nuremberg", "Augsburg"],
+        "Hesse": ["Frankfurt", "Wiesbaden", "Kassel"],
+        "North Rhine-Westphalia": ["Cologne", "Düsseldorf", "Dortmund"]
+      }
+    },
+    {
+      name: "France",
+      states: ["Île-de-France", "Provence-Alpes-Côte d'Azur", "Auvergne-Rhône-Alpes"],
+      cities: {
+        "Île-de-France": ["Paris", "Versailles", "Saint-Denis"],
+        "Provence-Alpes-Côte d'Azur": ["Marseille", "Nice", "Toulon"],
+        "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble", "Saint-Étienne"]
+      }
+
+    },
+    {
+      name: "Italy",
+      states: ["Lombardy", "Lazio", "Veneto"],
+      cities: {
+        "Lombardy": ["Milan", "Brescia", "Monza"],
+        "Lazio": ["Rome", "Latina", "Frosinone"],
+        "Veneto": ["Venice", "Verona", "Padua"]
+      }
+    }
+  ];
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -16,6 +94,7 @@ const Weather = () => {
       setWeatherData(response.data);
     } catch (error) {
       console.error("Error fetching weather data:", error);
+      setWeatherData(null); // Reset weatherData to null on error
     }
   };
 
@@ -32,9 +111,21 @@ const Weather = () => {
       return "It's hot outside, wear light clothes.";
     }
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     fetchData();
+  };
+
+  const handleChangeCountry = (e) => {
+    setCountry(e.target.value);
+    setState("");
+    setCity("");
+  };
+
+  const handleChangeState = (e) => {
+    setState(e.target.value);
+    setCity("");
   };
 
   const handleChangeCity = (e) => {
@@ -42,70 +133,85 @@ const Weather = () => {
   };
 
   return (
-    <>
-      <div
-        className=" flex flex-wrap justify-center items-center bg-cover bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://m-cdn.phonearena.com/images/article/143515-wide-two_1200/Apple-tests-adding-news-to-the-native-Weather-app-in-iOS-16.2-Beta.webp?1667618530')`,
-        }}
-      >
-        <div className="w-full">
-          <div className="w-full max-w-md mx-auto border border-gray-60 rounded-lg p-5 backdrop-blur-sm bg-white/30">
-            <div className="flex flex-col">
-              <h1 className="text-3xl text-center text-white   font-semibold mb-4">Weather App</h1>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={handleChangeCity}
-                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                    placeholder="Enter city name"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 my-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-                >
-                  Get Weather
-                </button>
-              </form>
-              {weatherData && (
-                <div className="bg-gray-100 p-4 rounded-md">
-                  <h2 className="text-xl font-semibold mb-2">
-                    {weatherData.name}, {weatherData.sys.country}
-                  </h2>
-                  <div className="flex items-center">
-                    <img
-                      src={`http://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
-                      alt="weather icon"
-                      className="w-10 h-10 mr-2"
-                    />
-                    <p className="text-lg">{weatherData.weather[0].main}</p>
-                  </div>
-                  <p className="text-lg mt-2">
-                    {weatherData.weather[0].description}
-                  </p>
-                  <p className="text-lg mt-2">{weatherData.main.temp}°C</p>
-                  <p className="text-lg mt-2">
-                    Humidity: {weatherData.main.humidity}%
-                  </p>
-                  <p className="text-lg mt-2">
-                    Wind Speed: {weatherData.wind.speed} m/s
-                  </p>
-                  
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4">
-            <p className="text-lg mt-2">{getClothingSuggestion(weatherData.main.temp)}</p>
-            </div>
-            
+    <div className="flex justify-center items-center h-screen">
+      <div className="max-w-md p-4 bg-gray-100 rounded-md">
+        <h1 className="text-3xl font-semibold mb-4 text-center">Weather App</h1>
+        <form onSubmit={handleSubmit} className="mb-4">
+          <div className="flex mb-4">
+            <select
+              value={country}
+              onChange={handleChangeCountry}
+              className="w-full px-4 py-2 mr-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select Country</option>
+              {countries.map((country, index) => (
+                <option key={index} value={country.name}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={state}
+              onChange={handleChangeState}
+              className="w-full px-4 py-2 mr-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select State</option>
+              {country &&
+                countries.find((c) => c.name === country)?.states.map((state, index) => (
+                  <option key={index} value={state}>
+                    {state}
+                  </option>
+                ))}
+            </select>
+            <select
+              value={city}
+              onChange={handleChangeCity}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Select City</option>
+              {state &&
+                countries
+                  .find((c) => c.name === country)
+                  ?.cities[state].map((city, index) => (
+                    <option key={index} value={city}>
+                      {city}
+                    </option>
+                  ))}
+            </select>
           </div>
-        </div>
+          <button
+            type="submit"
+            className="w-full mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Get Weather
+          </button>
+        </form>
+        {weatherData && (
+          <div className="bg-white p-4 rounded-md shadow">
+            <h2 className="text-xl font-semibold mb-2">
+              {weatherData.name}, {weatherData.sys.country}
+            </h2>
+            <div className="flex items-center mb-2">
+              <img
+                src={`http://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
+                alt="weather icon"
+                className="w-10 h-10 mr-2"
+              />
+              <p className="text-lg">{weatherData.weather[0].main}</p>
+            </div>
+            <p className="text-lg mb-2">{weatherData.weather[0].description}</p>
+            <p className="text-lg mb-2">{weatherData.main.temp}°C</p>
+            <p className="text-lg mb-2">Humidity: {weatherData.main.humidity}%</p>
+            <p className="text-lg">Wind Speed: {weatherData.wind.speed} m/s</p>
+          </div>
+        )}
+        {weatherData && (
+          <div className="mt-4">
+            <p className="text-lg">{getClothingSuggestion(weatherData.main.temp)}</p>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
